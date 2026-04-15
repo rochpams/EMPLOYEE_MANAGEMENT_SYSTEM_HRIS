@@ -30,4 +30,19 @@ class Employee extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function leaveRequests()
+    {
+        return $this->hasMany(LeaveRequest::class);
+    }
+
+    public function getFullNameAttribute()
+{
+    return $this->first_name . ' ' . $this->last_name;
+}
 }

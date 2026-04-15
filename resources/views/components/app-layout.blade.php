@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'HRIS Dashboard')</title>
+    <title>@isset($title){{ $title }} - @endisset HRIS Dashboard</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         * {
@@ -560,40 +560,40 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-brand">
-                HRIS
+                📋 HRIS
                 <span style="font-size: 12px; color: #64748b; margin-left: auto;">Employee Management</span>
             </div>
             
             <nav class="sidebar-nav">
                 <a href="{{ route('dashboard') }}" class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                    Dashboard
+                    📊 Dashboard
                 </a>
                 @if(auth()->user()->role === 'admin' || auth()->user()->role === 'hr')
                     <a href="{{ route('employees.index') }}" class="sidebar-link {{ request()->routeIs('employees.*') ? 'active' : '' }}">
-                        Employees
+                        👥 Employees
                     </a>
                     <a href="{{ route('departments.index') }}" class="sidebar-link {{ request()->routeIs('departments.*') ? 'active' : '' }}">
-                        Departments
+                        🏢 Departments
                     </a>
                     <a href="{{ route('reports.index') }}" class="sidebar-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
-                        Reports
+                        📊 Reports
                     </a>
                 @endif
                 <a href="{{ route('attendance.index') }}" class="sidebar-link {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
-                    Attendance
+                    ⏰ Attendance
                 </a>
                 <a href="{{ route('leave-requests.index') }}" class="sidebar-link {{ request()->routeIs('leave-requests.*') ? 'active' : '' }}">
-                    Leave Requests
+                    📋 Leave Requests
                 </a>
                 <a href="{{ route('profile.edit') }}" class="sidebar-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
-                    My Profile
+                    👤 My Profile
                 </a>
             </nav>
 
             <div class="sidebar-footer">
                 <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
                     @csrf
-                    <button type="submit" class="logout-btn">Logout</button>
+                    <button type="submit" class="logout-btn">🚪 Logout</button>
                 </form>
             </div>
         </aside>
@@ -619,7 +619,7 @@
 
             <!-- Content -->
             <div class="content">
-                @yield('content')
+                {{ $slot }}
             </div>
         </div>
     </div>
