@@ -6,25 +6,21 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        // If sessions are configured to use the database but the DB is
-        // unreachable or the `sessions` table doesn't exist, fall back to
-        // file sessions to avoid crashing the request pipeline.
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
+
         try {
             DB::connection()->getPdo();
 
