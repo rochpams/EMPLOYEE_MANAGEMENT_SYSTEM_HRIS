@@ -65,12 +65,12 @@ write_mysql_ca_file() {
     echo "WROTE_MYSQL_CA=1 PATH=$mysql_ca_path"
 }
 
-if [ -n "${MYSQL_CA_CERT_BASE64:-}" ] && [ -z "${MYSQL_ATTR_SSL_CA:-}" ]; then
+if [ -n "${MYSQL_CA_CERT_BASE64:-}" ]; then
     decoded_mysql_ca="$(printf '%s' "$MYSQL_CA_CERT_BASE64" | base64 -d)"
     write_mysql_ca_file "$decoded_mysql_ca"
 fi
 
-if [ -n "${MYSQL_CA_CERT:-}" ] && [ -z "${MYSQL_ATTR_SSL_CA:-}" ]; then
+if [ -n "${MYSQL_CA_CERT:-}" ] && [ -z "${MYSQL_CA_CERT_BASE64:-}" ]; then
     write_mysql_ca_file "$MYSQL_CA_CERT"
 fi
 
@@ -80,6 +80,10 @@ if [ -n "${MYSQL_ATTR_SSL_CA:-}" ] && [ ! -f "${MYSQL_ATTR_SSL_CA}" ]; then
             write_mysql_ca_file "$MYSQL_ATTR_SSL_CA"
             ;;
     esac
+fi
+
+if [ -n "${MYSQL_ATTR_SSL_CA:-}" ] && [ -f "${MYSQL_ATTR_SSL_CA}" ] && [ -n "${MYSQL_CA_CERT_BASE64:-}${MYSQL_CA_CERT:-}" ]; then
+    echo "MYSQL_ATTR_SSL_CA was pre-set, but an explicit CA payload was provided and took priority."
 fi
 
 for runtime_key in \
