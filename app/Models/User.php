@@ -88,6 +88,11 @@ class User extends Authenticatable
         return $this->hasOne(Employee::class);
     }
 
+    public function managedDepartments()
+    {
+        return $this->hasMany(Department::class, 'manager_id');
+    }
+
     /**
      * Get leave requests approved by this user.
      */

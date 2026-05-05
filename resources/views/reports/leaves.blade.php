@@ -1,68 +1,84 @@
 <x-app-layout>
     <x-slot name="title">Leave Requests Report</x-slot>
 
-    <div class="max-w-6xl">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold">Leave Requests Report</h2>
-            <a href="{{ route('reports.index') }}" class="text-blue-600 hover:text-blue-800">← Back to Reports</a>
-        </div>
+    <div class="hris-shell">
+        <section class="hris-hero">
+            <div class="hris-hero-grid">
+                <div>
+                    <p class="hris-eyebrow">Reports</p>
+                    <h1 class="hris-title">Leave Requests Report</h1>
+                    <p class="hris-subtitle">Monitor leave usage by status, request type, and time range.</p>
+                </div>
 
-        <div class="mb-6 bg-white rounded-lg shadow p-4">
-            <h3 class="font-bold mb-4">Leave Summary</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-yellow-600">{{ $summary['pending'] ?? 0 }}</p>
-                    <p class="text-gray-600">Pending</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-green-600">{{ $summary['approved'] ?? 0 }}</p>
-                    <p class="text-gray-600">Approved</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-red-600">{{ $summary['rejected'] ?? 0 }}</p>
-                    <p class="text-gray-600">Rejected</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-blue-600">{{ $summary['total'] ?? 0 }}</p>
-                    <p class="text-gray-600">Total</p>
-                </div>
+                <a href="{{ route('reports.index') }}" class="hris-btn-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Reports</a>
             </div>
-        </div>
+        </section>
+
+        <section class="hris-stat-grid">
+            <div class="hris-stat-card">
+                <p class="hris-stat-label">Pending</p>
+                <p class="hris-stat-value text-amber-300">{{ $summary['pending'] ?? 0 }}</p>
+            </div>
+            <div class="hris-stat-card">
+                <p class="hris-stat-label">Approved</p>
+                <p class="hris-stat-value text-emerald-300">{{ $summary['approved'] ?? 0 }}</p>
+            </div>
+            <div class="hris-stat-card">
+                <p class="hris-stat-label">Rejected</p>
+                <p class="hris-stat-value text-rose-300">{{ $summary['rejected'] ?? 0 }}</p>
+            </div>
+            <div class="hris-stat-card">
+                <p class="hris-stat-label">Total</p>
+                <p class="hris-stat-value text-sky-300">{{ $summary['total'] ?? 0 }}</p>
+            </div>
+        </section>
 
         @if($leaves->count())
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <table class="w-full divide-y">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Employee</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Leave Type</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Start Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">End Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Days</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y">
-                        @foreach($leaves as $leave)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm">{{ $leave->employee->first_name }} {{ $leave->employee->last_name }}</td>
-                                <td class="px-6 py-4 text-sm">{{ ucfirst(str_replace('_', ' ', $leave->leave_type)) }}</td>
-                                <td class="px-6 py-4 text-sm">{{ $leave->start_date->format('M d, Y') }}</td>
-                                <td class="px-6 py-4 text-sm">{{ $leave->end_date->format('M d, Y') }}</td>
-                                <td class="px-6 py-4 text-sm">{{ $leave->end_date->diffInDays($leave->start_date) + 1 }}</td>
-                                <td class="px-6 py-4 text-sm">
-                                    <span class="px-3 py-1 rounded-full text-xs {{ $leave->status === 'pending' ? 'bg-yellow-200 text-yellow-800' : ($leave->status === 'approved' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800') }}">
-                                        {{ ucfirst($leave->status) }}
-                                    </span>
-                                </td>
+            <section class="hris-panel">
+                <div class="hris-panel-header">
+                    <div>
+                        <h2 class="hris-panel-title">Leave Entries</h2>
+                        <p class="hris-panel-subtitle">A summary of leave requests across the organization.</p>
+                    </div>
+
+                    <span class="hris-pill hris-pill-info">{{ $leaves->count() }} records</span>
+                </div>
+
+                <div class="hris-table-wrap">
+                    <table class="hris-table">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Leave Type</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Days</th>
+                                <th>Status</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach($leaves as $leave)
+                                <tr>
+                                    <td>{{ $leave->employee->first_name }} {{ $leave->employee->last_name }}</td>
+                                    <td>{{ ucfirst(str_replace('_', ' ', $leave->leave_type)) }}</td>
+                                    <td>{{ $leave->start_date->format('M d, Y') }}</td>
+                                    <td>{{ $leave->end_date->format('M d, Y') }}</td>
+                                    <td>{{ $leave->end_date->diffInDays($leave->start_date) + 1 }}</td>
+                                    <td>
+                                        <span class="hris-pill {{ $leave->status === 'pending' ? 'hris-pill-warning' : ($leave->status === 'approved' ? 'hris-pill-success' : 'hris-pill-danger') }}">
+                                            {{ ucfirst($leave->status) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         @else
-            <div class="bg-white rounded-lg shadow p-6 text-center text-gray-500">
-                No leave records available
+            <div class="hris-empty">
+                <div class="hris-empty-icon"><i class="bi bi-calendar2-check"></i></div>
+                <p>No leave records available.</p>
             </div>
         @endif
     </div>

@@ -1,122 +1,116 @@
 <x-app-layout>
     <x-slot name="title">Leave Requests</x-slot>
 
-    <div class="max-w-6xl">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold text-gray-800">Leave Requests</h2>
-            @if(auth()->user()->role === 'employee')
-                <a href="{{ route('leave-requests.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                    + Submit Leave Request
-                </a>
-            @endif
-        </div>
+    <div class="hris-shell">
+        <section class="hris-hero">
+            <div class="hris-hero-grid">
+                <div>
+                    <p class="hris-eyebrow">Employee Requests</p>
+                    <h1 class="hris-title">My Leave</h1>
+                    <p class="hris-subtitle">Track submitted leave requests, their status, and approval history in one place.</p>
+                </div>
 
-        <!-- Filter Tabs -->
-        <div class="flex gap-2 mb-6">
-            <a href="{{ route('leave-requests.index', ['status' => '']) }}" class="px-4 py-2 rounded {{ request('status') === '' ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
-                All
-            </a>
-            <a href="{{ route('leave-requests.index', ['status' => 'pending']) }}" class="px-4 py-2 rounded {{ request('status') === 'pending' ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
-                Pending
-            </a>
-            <a href="{{ route('leave-requests.index', ['status' => 'approved']) }}" class="px-4 py-2 rounded {{ request('status') === 'approved' ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
-                Approved
-            </a>
-            <a href="{{ route('leave-requests.index', ['status' => 'rejected']) }}" class="px-4 py-2 rounded {{ request('status') === 'rejected' ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
-                Rejected
-            </a>
-        </div>
+                @if(auth()->user()->role === 'employee')
+                    <a href="{{ route('leave-requests.create') }}" class="hris-btn-primary">+ Submit Leave Request</a>
+                @endif
+            </div>
+        </section>
 
-        @if($leaveRequests->count())
-            <div class="space-y-4">
+        <section class="hris-panel">
+            <div class="hris-panel-header">
+                <div>
+                    <h2 class="hris-panel-title">Filter by Status</h2>
+                    <p class="hris-panel-subtitle">Switch between all requests and individual approval states.</p>
+                </div>
+            </div>
+
+            <div class="hris-panel-body">
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ route('leave-requests.index') }}" class="btn btn-sm {{ !request('status') ? 'btn-primary' : 'btn-outline-secondary' }}">All</a>
+                    <a href="{{ route('leave-requests.index', ['status' => 'pending']) }}" class="btn btn-sm {{ request('status') === 'pending' ? 'btn-warning' : 'btn-outline-secondary' }}">Pending</a>
+                    <a href="{{ route('leave-requests.index', ['status' => 'approved']) }}" class="btn btn-sm {{ request('status') === 'approved' ? 'btn-success' : 'btn-outline-secondary' }}">Approved</a>
+                    <a href="{{ route('leave-requests.index', ['status' => 'rejected']) }}" class="btn btn-sm {{ request('status') === 'rejected' ? 'btn-danger' : 'btn-outline-secondary' }}">Rejected</a>
+                    <a href="{{ route('leave-requests.index', ['status' => 'cancelled']) }}" class="btn btn-sm {{ request('status') === 'cancelled' ? 'btn-dark' : 'btn-outline-secondary' }}">Cancelled</a>
+                </div>
+            </div>
+        </section>
+
+        @if($leaveRequests instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator ? $leaveRequests->count() : count($leaveRequests))
+            <div class="d-grid gap-3">
                 @foreach($leaveRequests as $leave)
-                    <div class="bg-white rounded-lg shadow p-5">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <h3 class="text-lg font-bold">{{ $leave->employee->first_name }} {{ $leave->employee->last_name }}</h3>
-                                <p class="text-gray-600">{{ $leave->leave_type }} - {{ $leave->start_date->format('M d') }} to {{ $leave->end_date->format('M d, Y') }}</p>
-                                <p class="text-gray-500 text-sm mt-2">Reason: {{ $leave->reason }}</p>
+                    <article class="hris-card">
+                        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+                            <div class="flex-grow-1">
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <h3 class="h5 mb-0">{{ $leave->employee?->full_name ?? 'Unknown employee' }}</h3>
+                                    <span class="hris-pill {{ $leave->status === 'pending' ? 'hris-pill-warning' : ($leave->status === 'approved' ? 'hris-pill-success' : ($leave->status === 'cancelled' ? 'hris-pill-neutral' : 'hris-pill-danger')) }}">
+                                        {{ ucfirst($leave->status) }}
+                                    </span>
+                                </div>
+
+                                <div class="row g-3 mt-1">
+                                    <div class="col-12 col-md-6 col-xl-4">
+                                        <div class="small text-uppercase text-secondary">Leave Type</div>
+                                        <div>{{ ucfirst(str_replace('_', ' ', $leave->leave_type)) }}</div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6 col-xl-4">
+                                        <div class="small text-uppercase text-secondary">Dates</div>
+                                        <div>{{ $leave->start_date->format('M d') }} - {{ $leave->end_date->format('M d, Y') }}</div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6 col-xl-4">
+                                        <div class="small text-uppercase text-secondary">Approved By</div>
+                                        <div>{{ $leave->approvedBy?->name ?? 'N/A' }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3 p-3 border rounded bg-light">
+                                    <span class="fw-semibold">Reason:</span> {{ $leave->reason }}
+                                </div>
                             </div>
-                            <div class="flex flex-col items-end gap-2">
-                                <span class="px-3 py-1 rounded-full text-sm font-semibold
-                                    {{ $leave->status === 'pending' ? 'bg-yellow-200 text-yellow-800' : 
-                                       ($leave->status === 'approved' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800') }}">
-                                    {{ ucfirst($leave->status) }}
-                                </span>
-                                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'hr' || auth()->user()->role === 'manager')
+
+                            <div class="d-flex flex-column align-items-start align-items-lg-end gap-2">
+                                @if(auth()->user()->isAdmin() || auth()->user()->isHR() || auth()->user()->isManager())
                                     @if($leave->status === 'pending')
-                                        <div class="flex gap-2">
-                                            <form action="{{ route('leave-requests.approve', $leave) }}" method="POST" class="inline">
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <form action="{{ route('leave-requests.update-status', $leave) }}" method="POST">
                                                 @csrf
-                                                <button type="submit" class="text-green-600 hover:text-green-800 text-sm">Approve</button>
+                                                @method('PATCH')
+                                                <input type="hidden" name="status" value="approved">
+                                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
                                             </form>
-                                            <form action="{{ route('leave-requests.reject', $leave) }}" method="POST" class="inline">
+
+                                            <form action="{{ route('leave-requests.update-status', $leave) }}" method="POST">
                                                 @csrf
-                                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Reject</button>
+                                                @method('PATCH')
+                                                <input type="hidden" name="status" value="rejected">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
                                             </form>
                                         </div>
                                     @endif
                                 @endif
-                                @if(auth()->user()->role === 'employee' && $leave->status === 'pending')
-                                    <form action="{{ route('leave-requests.destroy', $leave) }}" method="POST" class="inline" onsubmit="return confirm('Cancel this request?')">
+
+                                @if(auth()->user()->isEmployee() && $leave->status === 'pending')
+                                    <form action="{{ route('leave-requests.cancel', $leave) }}" method="POST" onsubmit="return confirm('Cancel this request?')">
                                         @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-gray-600 hover:text-gray-800 text-sm">Cancel</button>
+                                        @method('PATCH')
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Cancel Request</button>
                                     </form>
                                 @endif
                             </div>
                         </div>
-                    </div>
+                    </article>
                 @endforeach
             </div>
-        @else
-            <div class="bg-white rounded-lg shadow p-6 text-center text-gray-500">
-                No leave requests found
-            </div>
-        @endif
-    </div>
-                    <div class="bg-white rounded-lg shadow p-5">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <h3 class="text-lg font-bold">{{ $leave->employee->first_name }} {{ $leave->employee->last_name }}</h3>
-                                <p class="text-gray-600">{{ $leave->leave_type }} - {{ $leave->start_date->format('M d') }} to {{ $leave->end_date->format('M d, Y') }}</p>
-                                <p class="text-gray-500 text-sm mt-2">Reason: {{ $leave->reason }}</p>
-                            </div>
-                            <div class="flex flex-col items-end gap-2">
-                                <span class="px-3 py-1 rounded-full text-sm font-semibold
-                                    {{ $leave->status === 'pending' ? 'bg-yellow-200 text-yellow-800' : 
-                                       ($leave->status === 'approved' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800') }}">
-                                    {{ ucfirst($leave->status) }}
-                                </span>
-                                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'hr' || auth()->user()->role === 'manager')
-                                    @if($leave->status === 'pending')
-                                        <div class="flex gap-2">
-                                            <form action="{{ route('leave-requests.approve', $leave) }}" method="POST" class="inline">
-                                                @csrf
-                                                <button type="submit" class="text-green-600 hover:text-green-800 text-sm">Approve</button>
-                                            </form>
-                                            <form action="{{ route('leave-requests.reject', $leave) }}" method="POST" class="inline">
-                                                @csrf
-                                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Reject</button>
-                                            </form>
-                                        </div>
-                                    @endif
-                                @endif
-                                @if(auth()->user()->role === 'employee' && $leave->status === 'pending')
-                                    <form action="{{ route('leave-requests.destroy', $leave) }}" method="POST" class="inline" onsubmit="return confirm('Cancel this request?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-gray-600 hover:text-gray-800 text-sm">Cancel</button>
-                                    </form>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
+
+            <div class="mt-6">
+                {{ method_exists($leaveRequests, 'links') ? $leaveRequests->links() : '' }}
             </div>
         @else
-            <div class="bg-white rounded-lg shadow p-6 text-center text-gray-500">
-                No leave requests found
+            <div class="hris-empty">
+                <div class="hris-empty-icon"><i class="bi bi-calendar2-check"></i></div>
+                <p>No leave requests found.</p>
             </div>
         @endif
     </div>

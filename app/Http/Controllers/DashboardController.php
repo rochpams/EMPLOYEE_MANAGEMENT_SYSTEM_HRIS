@@ -6,7 +6,6 @@ use App\Models\Employee;
 use App\Models\Department;
 use App\Models\Attendance;
 use App\Models\LeaveRequest;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -59,19 +58,11 @@ class DashboardController extends Controller
     private function getManagerDashboard()
     {
         $user = auth()->user();
-        $employee = $user->employee;
-
-        // Get department managed by this user
         $department = Department::where('manager_id', $user->id)->first();
-
-        if ($department) {
-            $departmentEmployees = $department->employees()->pluck('id');
-        } else {
-            $departmentEmployees = [];
-        }
+        $departmentEmployees = $department ? $department->employees()->pluck('id') : collect();
 
         return [
-            'teamSize' => count($departmentEmployees),
+            'teamSize' => $departmentEmployees->count(),
             'presentToday' => Attendance::where('attendance_date', Carbon::today())
                 ->whereIn('employee_id', $departmentEmployees)
                 ->where('status', 'present')
@@ -106,7 +97,7 @@ class DashboardController extends Controller
                 ->where('attendance_date', '>=', Carbon::now()->startOfMonth())
                 ->where('status', 'present')
                 ->count(),
-            'leaveBalance' => 15, // Default annual leave
+            'leaveBalance' => 15,
             'pendingLeaveRequests' => $employee->leaveRequests()
                 ->where('status', 'pending')
                 ->count(),
@@ -128,10 +119,11 @@ class DashboardController extends Controller
 
         foreach ($leaveRequests as $request) {
             $activities[] = [
-                'type' => 'Leave Request',
-                'description' => $request->employee->full_name . ' submitted a leave request',
+                'title' => 'Leave Request',
+                'description' => ($request->employee?->full_name ?? 'Unknown employee') . ' submitted a leave request',
                 'date' => $request->created_at,
                 'status' => $request->status,
+                'time' => $request->created_at?->diffForHumans() ?? '',
             ];
         }
 
@@ -143,13 +135,14 @@ class DashboardController extends Controller
 
         foreach ($attendances as $attendance) {
             $activities[] = [
-                'type' => 'Attendance',
-                'description' => $attendance->employee->full_name . ' marked ' . $attendance->status,
+                'title' => 'Attendance',
+                'description' => ($attendance->employee?->full_name ?? 'Unknown employee') . ' marked ' . $attendance->status,
                 'date' => $attendance->created_at,
                 'status' => $attendance->status,
+                'time' => $attendance->created_at?->diffForHumans() ?? '',
             ];
         }
 
-        return collect($activities)->sortByDesc('date')->take($limit);
+        return collect($activities)->sortByDesc('date')->take($limit)->values();
     }
 }

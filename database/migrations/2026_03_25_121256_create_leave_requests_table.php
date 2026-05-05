@@ -19,7 +19,7 @@ return new class extends Migration
     $table->date('end_date');
     $table->text('reason');
     $table->string('status')->default('pending');
-    $table->foreignId('approved_by')->nullable()->constrained('employees')->nullOnDelete();
+    $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
     $table->timestamps();
 });
     }

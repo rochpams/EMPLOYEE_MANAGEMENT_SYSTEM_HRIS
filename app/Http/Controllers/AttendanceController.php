@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class AttendanceController extends Controller
 {
@@ -32,9 +33,8 @@ class AttendanceController extends Controller
             $query->where('status', $request->status);
         }
         
-        if ($user->role === 'employee') {
-            $employee = $user->employee;
-            $query->where('employee_id', $employee->id);
+        if ($user->role === 'employee' && $user->employee) {
+            $query->where('employee_id', $user->employee->id);
         }
         
         $attendances = $query->orderBy('attendance_date', 'desc')->paginate(15);
@@ -71,7 +71,10 @@ class AttendanceController extends Controller
     public function timeIn(Request $request)
     {
         $user = auth()->user();
-        $employee = $user->employee;
+        $employee = $this->resolveEmployee($request, $user);
+        if (!$employee) {
+            return redirect()->back()->with('error', 'Employee profile not found');
+        }
         $today = Carbon::today();
 
         // Check if already timed in today
@@ -103,7 +106,10 @@ class AttendanceController extends Controller
     public function timeOut(Request $request)
     {
         $user = auth()->user();
-        $employee = $user->employee;
+        $employee = $this->resolveEmployee($request, $user);
+        if (!$employee) {
+            return redirect()->back()->with('error', 'Employee profile not found');
+        }
         $today = Carbon::today();
 
         $attendance = Attendance::where('employee_id', $employee->id)
@@ -131,7 +137,7 @@ class AttendanceController extends Controller
         $validated = $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'attendance_date' => 'required|date',
-            'status' => 'required|in:present,late,absent,on_leave',
+            'status' => ['required', Rule::in(['present', 'late', 'absent', 'on_leave'])],
             'remarks' => 'nullable|string',
         ]);
 
@@ -144,5 +150,14 @@ class AttendanceController extends Controller
         );
 
         return redirect()->back()->with('success', 'Attendance marked successfully');
+    }
+
+    private function resolveEmployee(Request $request, $user)
+    {
+        if ($request->filled('employee_id') && ($user->isAdmin() || $user->isHR())) {
+            return Employee::find($request->employee_id);
+        }
+
+        return $user->employee;
     }
 }

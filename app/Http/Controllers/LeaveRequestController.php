@@ -5,22 +5,36 @@ namespace App\Http\Controllers;
 use App\Models\LeaveRequest;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class LeaveRequestController extends Controller
 {
     /**
      * Display a listing of leave requests
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
         
         if ($user->role === 'employee') {
-            $leaveRequests = $user->employee->leaveRequests()->latest()->paginate(10);
+            $leaveRequests = $user->employee
+                ? $user->employee->leaveRequests()->latest()->paginate(10)
+                : collect([]);
         } else {
-            $leaveRequests = LeaveRequest::with('employee', 'approvedBy')
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
+            $query = LeaveRequest::with('employee', 'approvedBy')->orderBy('created_at', 'desc');
+
+            if ($user->isManager()) {
+                $managedDepartmentIds = $user->managedDepartments()->pluck('id');
+                $query->whereHas('employee', function ($employeeQuery) use ($managedDepartmentIds) {
+                    $employeeQuery->whereIn('department_id', $managedDepartmentIds);
+                });
+            }
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            $leaveRequests = $query->paginate(10);
         }
         
         return view('leave-requests.index', compact('leaveRequests'));
@@ -41,12 +55,16 @@ class LeaveRequestController extends Controller
     {
         $user = auth()->user();
         $employee = $user->employee;
+
+        if (!$employee) {
+            return redirect()->back()->with('error', 'Employee profile not found');
+        }
         
         $validated = $request->validate([
-            'leave_type' => 'required|string|max:255',
-            'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'reason' => 'required|string',
+            'leave_type' => ['required', 'string', 'max:255'],
+            'start_date' => ['required', 'date', 'after_or_equal:today'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+            'reason' => ['required', 'string'],
         ]);
 
         $validated['employee_id'] = $employee->id;
@@ -62,6 +80,25 @@ class LeaveRequestController extends Controller
      */
     public function show(LeaveRequest $leaveRequest)
     {
+        $user = auth()->user();
+
+        if ($user->isEmployee()) {
+            if (!$user->employee || $leaveRequest->employee_id !== $user->employee->id) {
+                return redirect()->route('leave-requests.index')->with('error', 'Unauthorized');
+            }
+        }
+
+        if ($user->isManager()) {
+            $managedDepartmentIds = $user->managedDepartments()->pluck('id');
+            $isInManagedDepartment = $leaveRequest->employee()
+                ->whereIn('department_id', $managedDepartmentIds)
+                ->exists();
+
+            if (!$isInManagedDepartment) {
+                return redirect()->route('leave-requests.index')->with('error', 'Unauthorized');
+            }
+        }
+
         return view('leave-requests.show', compact('leaveRequest'));
     }
 
@@ -71,11 +108,16 @@ class LeaveRequestController extends Controller
     public function updateStatus(Request $request, LeaveRequest $leaveRequest)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,approved,rejected',
+            'status' => ['required', Rule::in(['approved', 'rejected'])],
         ]);
 
         if ($leaveRequest->status !== 'pending') {
             return redirect()->back()->with('error', 'Cannot modify a ' . $leaveRequest->status . ' leave request');
+        }
+
+        $actor = auth()->user();
+        if (!$actor->isAdmin() && !$actor->isHR() && !$actor->isManager()) {
+            return redirect()->back()->with('error', 'Unauthorized');
         }
 
         $leaveRequest->update([
@@ -91,7 +133,9 @@ class LeaveRequestController extends Controller
      */
     public function cancel(LeaveRequest $leaveRequest)
     {
-        if ($leaveRequest->employee_id !== auth()->user()->employee->id) {
+        $employee = auth()->user()->employee;
+
+        if (!$employee || $leaveRequest->employee_id !== $employee->id) {
             return redirect()->back()->with('error', 'Unauthorized');
         }
 
@@ -99,7 +143,7 @@ class LeaveRequestController extends Controller
             return redirect()->back()->with('error', 'Cannot cancel ' . $leaveRequest->status . ' request');
         }
 
-        $leaveRequest->update(['status' => 'cancelled']);
+        $leaveRequest->update(['status' => LeaveRequest::STATUS_CANCELLED]);
 
         return redirect()->back()->with('success', 'Leave request cancelled successfully');
     }

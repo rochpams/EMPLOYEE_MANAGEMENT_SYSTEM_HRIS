@@ -1,26 +1,30 @@
 <x-app-layout>
     <x-slot name="title">Submit Leave Request</x-slot>
 
-    <div class="max-w-2xl mx-auto">
-        <h2 class="text-3xl font-bold mb-6">Submit Leave Request</h2>
-
-        @if ($errors->any())
-            <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
-                <ul class="list-disc list-inside">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+    <div class="hris-form-shell">
+        <div class="hris-form-card">
+            <div class="hris-form-header">
+                <p class="hris-eyebrow">Leave Management</p>
+                <h1 class="hris-form-title">Submit Leave Request</h1>
+                <p class="hris-form-text">Create a new leave request for approval.</p>
             </div>
-        @endif
 
-        <div class="bg-white rounded-lg shadow p-6">
-            <form method="POST" action="{{ route('leave-requests.store') }}" class="space-y-4">
+            @if ($errors->any())
+                <div class="hris-alert hris-alert-error mb-4">
+                    <ul class="list-disc list-inside space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('leave-requests.store') }}" class="space-y-5">
                 @csrf
 
-                <div>
-                    <label class="block font-semibold mb-1">Leave Type</label>
-                    <select name="leave_type" class="w-full border border-gray-300 rounded px-3 py-2" required>
+                <div class="hris-form-group">
+                    <label class="hris-form-label">Leave Type</label>
+                    <select name="leave_type" class="hris-form-select" required>
                         <option value="">Select Leave Type</option>
                         <option value="sick_leave">Sick Leave</option>
                         <option value="vacation">Vacation</option>
@@ -30,29 +34,25 @@
                     </select>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block font-semibold mb-1">Start Date</label>
-                        <input type="date" name="start_date" class="w-full border border-gray-300 rounded px-3 py-2" required>
+                <div class="hris-form-grid hris-form-grid-2">
+                    <div class="hris-form-group">
+                        <label class="hris-form-label">Start Date</label>
+                        <input type="date" name="start_date" class="hris-form-input" required>
                     </div>
-                    <div>
-                        <label class="block font-semibold mb-1">End Date</label>
-                        <input type="date" name="end_date" class="w-full border border-gray-300 rounded px-3 py-2" required>
+                    <div class="hris-form-group">
+                        <label class="hris-form-label">End Date</label>
+                        <input type="date" name="end_date" class="hris-form-input" required>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block font-semibold mb-1">Reason</label>
-                    <textarea name="reason" class="w-full border border-gray-300 rounded px-3 py-2" rows="5" required></textarea>
+                <div class="hris-form-group">
+                    <label class="hris-form-label">Reason</label>
+                    <textarea name="reason" class="hris-form-textarea" rows="5" required></textarea>
                 </div>
 
-                <div class="flex gap-4">
-                    <button type="submit" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                        Submit Request
-                    </button>
-                    <a href="{{ route('leave-requests.index') }}" class="flex-1 bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 text-center">
-                        Cancel
-                    </a>
+                <div class="hris-form-actions-row pt-2">
+                    <a href="{{ route('leave-requests.index') }}" class="hris-btn-secondary">Cancel</a>
+                    <button type="submit" class="hris-btn-primary">Submit Request</button>
                 </div>
             </form>
         </div>

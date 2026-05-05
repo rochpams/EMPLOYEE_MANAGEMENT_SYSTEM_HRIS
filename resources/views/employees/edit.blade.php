@@ -1,75 +1,82 @@
 <x-app-layout>
     <x-slot name="title">Edit Employee</x-slot>
 
-    <div class="max-w-3xl mx-auto bg-white shadow rounded p-6">
-        <h2 class="text-2xl font-bold mb-6">Edit Employee</h2>
-
-        @if ($errors->any())
-            <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
-                <ul class="list-disc list-inside">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('employees.update', $employee) }}" class="space-y-4">
-            @csrf
-            @method('PUT')
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block font-semibold mb-1">First Name</label>
-                    <input type="text" name="first_name" value="{{ old('first_name', $employee->first_name) }}" class="w-full border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200">
-                </div>
-                <div>
-                    <label class="block font-semibold mb-1">Last Name</label>
-                    <input type="text" name="last_name" value="{{ old('last_name', $employee->last_name) }}" class="w-full border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200">
-                </div>
+    <div class="hris-form-shell">
+        <div class="hris-form-card">
+            <div class="hris-form-header">
+                <p class="hris-eyebrow">Employee Management</p>
+                <h1 class="hris-form-title">Edit Employee</h1>
+                <p class="hris-form-text">Update the employee's profile, department assignment, and status.</p>
             </div>
 
-            <div>
-                <label class="block font-semibold mb-1">Email</label>
-                <input type="email" name="email" value="{{ old('email', $employee->email) }}" class="w-full border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200">
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block font-semibold mb-1">Department</label>
-                    <select name="department_id" class="w-full border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200">
-                        <option value="">Select Department</option>
-                        @foreach($departments as $dept)
-                            <option value="{{ $dept->id }}" {{ (old('department_id', $employee->department_id) == $dept->id) ? 'selected' : '' }}>
-                                {{ $dept->name }}
-                            </option>
+            @if ($errors->any())
+                <div class="hris-alert hris-alert-error mb-4">
+                    <ul class="list-disc list-inside space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
                         @endforeach
-                    </select>
+                    </ul>
                 </div>
-                <div>
-                    <label class="block font-semibold mb-1">Position</label>
-                    <input type="text" name="position" value="{{ old('position', $employee->position) }}" class="w-full border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200">
-                </div>
-            </div>
+            @endif
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block font-semibold mb-1">Hire Date</label>
-                    <input type="date" name="hire_date" value="{{ old('hire_date', $employee->hire_date) }}" class="w-full border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200">
-                </div>
-                <div>
-                    <label class="block font-semibold mb-1">Status</label>
-                    <select name="employment_status" class="w-full border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200">
-                        <option value="active" {{ old('employment_status', $employee->employment_status) == 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="inactive" {{ old('employment_status', $employee->employment_status) == 'inactive' ? 'selected' : '' }}>Inactive</option>
-                    </select>
-                </div>
-            </div>
+            <form method="POST" action="{{ route('employees.update', $employee) }}" class="space-y-5">
+                @csrf
+                @method('PATCH')
 
-            <div class="flex justify-end mt-6">
-                <a href="{{ route('employees.index') }}" class="mr-3 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</a>
-                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Update Employee</button>
-            </div>
-        </form>
+                <div class="hris-form-grid hris-form-grid-2">
+                    <div class="hris-form-group">
+                        <label class="hris-form-label">First Name</label>
+                        <input type="text" name="first_name" value="{{ old('first_name', $employee->first_name) }}" class="hris-form-input">
+                    </div>
+                    <div class="hris-form-group">
+                        <label class="hris-form-label">Last Name</label>
+                        <input type="text" name="last_name" value="{{ old('last_name', $employee->last_name) }}" class="hris-form-input">
+                    </div>
+                </div>
+
+                <div class="hris-form-group">
+                    <label class="hris-form-label">Email</label>
+                    <input type="email" name="email" value="{{ old('email', $employee->email) }}" class="hris-form-input">
+                </div>
+
+                <div class="hris-form-grid hris-form-grid-2">
+                    <div class="hris-form-group">
+                        <label class="hris-form-label">Department</label>
+                        <select name="department_id" class="hris-form-select">
+                            <option value="">Select Department</option>
+                            @foreach($departments as $dept)
+                                <option value="{{ $dept->id }}" {{ (old('department_id', $employee->department_id) == $dept->id) ? 'selected' : '' }}>
+                                    {{ $dept->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="hris-form-group">
+                        <label class="hris-form-label">Position</label>
+                        <input type="text" name="position" value="{{ old('position', $employee->position) }}" class="hris-form-input">
+                    </div>
+                </div>
+
+                <div class="hris-form-grid hris-form-grid-2">
+                    <div class="hris-form-group">
+                        <label class="hris-form-label">Hire Date</label>
+                        <input type="date" name="hire_date" value="{{ old('hire_date', $employee->hire_date?->format('Y-m-d') ?? $employee->hire_date) }}" class="hris-form-input">
+                    </div>
+                    <div class="hris-form-group">
+                        <label class="hris-form-label">Employment Status</label>
+                        <select name="employment_status" class="hris-form-select">
+                            <option value="active" {{ old('employment_status', $employee->employment_status) == 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ old('employment_status', $employee->employment_status) == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            <option value="terminated" {{ old('employment_status', $employee->employment_status) == 'terminated' ? 'selected' : '' }}>Terminated</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="hris-form-actions-row pt-2">
+                    <a href="{{ route('employees.index') }}" class="hris-btn-secondary">Cancel</a>
+                    <button type="submit" class="hris-btn-primary">Update Employee</button>
+                </div>
+            </form>
+        </div>
     </div>
 </x-app-layout>

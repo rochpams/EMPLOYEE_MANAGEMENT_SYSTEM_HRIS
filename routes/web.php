@@ -48,19 +48,18 @@ Route::middleware('auth')->group(function () {
 
         Route::prefix('reports')->name('reports.')->group(function () {
             Route::get('/', [ReportController::class, 'index'])->name('index');
-            Route::get('/{type}', [ReportController::class, 'show'])->name('show');
             Route::get('/employees', [ReportController::class, 'employeeReport'])->name('employees');
             Route::get('/attendance', [ReportController::class, 'attendanceReport'])->name('attendance');
             Route::get('/leaves', [ReportController::class, 'leaveReport'])->name('leaves');
             Route::get('/departments', [ReportController::class, 'departmentReport'])->name('departments');
             Route::get('/activity', [ReportController::class, 'activityReport'])->name('activity');
+            Route::get('/{type}', [ReportController::class, 'show'])->name('show');
         });
     });
 
     // Manager and HR routes - Leave request approval
     Route::middleware('role:admin,hr,manager')->group(function () {
         Route::prefix('leave-requests')->name('leave-requests.')->group(function () {
-            Route::get('/', [LeaveRequestController::class, 'index'])->name('index');
             Route::patch('/{leaveRequest}/status', [LeaveRequestController::class, 'updateStatus'])->name('update-status');
         });
     });
@@ -83,6 +82,7 @@ Route::middleware('auth')->group(function () {
 
         // Leave requests - submit
         Route::prefix('leave-requests')->name('leave-requests.')->group(function () {
+            Route::get('/', [LeaveRequestController::class, 'index'])->name('index');
             Route::get('/create', [LeaveRequestController::class, 'create'])->name('create');
             Route::post('/', [LeaveRequestController::class, 'store'])->name('store');
             Route::get('/{leaveRequest}', [LeaveRequestController::class, 'show'])->name('show');

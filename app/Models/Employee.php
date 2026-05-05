@@ -21,6 +21,10 @@ class Employee extends Model
         'employment_status',
     ];
 
+    protected $casts = [
+        'hire_date' => 'date',
+    ];
+
     public function department()
     {
         return $this->belongsTo(Department::class);
@@ -42,7 +46,7 @@ class Employee extends Model
     }
 
     public function getFullNameAttribute()
-{
-    return $this->first_name . ' ' . $this->last_name;
-}
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
 }

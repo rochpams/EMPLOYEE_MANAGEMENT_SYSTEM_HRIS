@@ -19,6 +19,11 @@ class LeaveRequest extends Model
         'approved_by',
     ];
 
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
+    public const STATUS_CANCELLED = 'cancelled';
+
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
@@ -29,8 +34,13 @@ class LeaveRequest extends Model
         return $this->belongsTo(Employee::class);
     }
 
-    public function approver(): BelongsTo
+    public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function approver(): BelongsTo
+    {
+        return $this->approvedBy();
     }
 }

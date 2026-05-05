@@ -1,46 +1,65 @@
 <x-app-layout>
     <x-slot name="title">Employee List Report</x-slot>
 
-    <div class="max-w-6xl">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold">Employee List Report</h2>
-            <a href="{{ route('reports.index') }}" class="text-blue-600 hover:text-blue-800">← Back to Reports</a>
-        </div>
+    <div class="hris-shell">
+        <section class="hris-hero">
+            <div class="hris-hero-grid">
+                <div>
+                    <p class="hris-eyebrow">Reports</p>
+                    <h1 class="hris-title">Employee List Report</h1>
+                    <p class="hris-subtitle">Browse employee records with contact details, department assignment, position, and employment status.</p>
+                </div>
+
+                <a href="{{ route('reports.index') }}" class="hris-btn-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Reports</a>
+            </div>
+        </section>
 
         @if($employees->count())
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <table class="w-full divide-y">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Employee ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Department</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Position</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y">
-                        @foreach($employees as $emp)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm">{{ $emp->id }}</td>
-                                <td class="px-6 py-4 text-sm">{{ $emp->first_name }} {{ $emp->last_name }}</td>
-                                <td class="px-6 py-4 text-sm">{{ $emp->email }}</td>
-                                <td class="px-6 py-4 text-sm">{{ $emp->department->name ?? 'N/A' }}</td>
-                                <td class="px-6 py-4 text-sm">{{ $emp->position }}</td>
-                                <td class="px-6 py-4 text-sm">
-                                    <span class="px-3 py-1 rounded-full text-xs {{ $emp->employment_status === 'active' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800' }}">
-                                        {{ ucfirst($emp->employment_status) }}
-                                    </span>
-                                </td>
+            <section class="hris-panel">
+                <div class="hris-panel-header">
+                    <div>
+                        <h2 class="hris-panel-title">Employee Directory</h2>
+                        <p class="hris-panel-subtitle">Current employee records pulled from the HRIS database.</p>
+                    </div>
+
+                    <span class="hris-pill hris-pill-info">{{ $employees->count() }} employees</span>
+                </div>
+
+                <div class="hris-table-wrap">
+                    <table class="hris-table">
+                        <thead>
+                            <tr>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Position</th>
+                                <th>Status</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach($employees as $emp)
+                                <tr>
+                                    <td>{{ $emp->id }}</td>
+                                    <td>{{ $emp->first_name }} {{ $emp->last_name }}</td>
+                                    <td>{{ $emp->email }}</td>
+                                    <td>{{ $emp->department->name ?? 'N/A' }}</td>
+                                    <td>{{ $emp->position }}</td>
+                                    <td>
+                                        <span class="hris-pill {{ $emp->employment_status === 'active' ? 'hris-pill-success' : 'hris-pill-danger' }}">
+                                            {{ ucfirst($emp->employment_status) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         @else
-            <div class="bg-white rounded-lg shadow p-6 text-center text-gray-500">
-                No employee data available
+            <div class="hris-empty">
+                <div class="hris-empty-icon"><i class="bi bi-people"></i></div>
+                <p>No employee data available.</p>
             </div>
         @endif
     </div>

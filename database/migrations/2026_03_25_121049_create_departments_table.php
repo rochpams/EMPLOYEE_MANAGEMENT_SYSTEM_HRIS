@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('departments', function (Blueprint $table) {
-        $table->id();
-        $table->string('name');
-        $table->text('description')->nullable();
-        $table->unsignedBigInteger('manager_id')->nullable(); // remove foreign key for now
-        $table->string('status')->default('active');
-        $table->timestamps();
-    });
+            $table->id();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->foreignId('manager_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('status')->default('active');
+            $table->timestamps();
+        });
     }
 
     /**

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Department;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
 {
@@ -21,18 +23,33 @@ class EmployeeController extends Controller
         return view('employees.create', compact('departments'));
     }
 
+    public function show(Employee $employee)
+    {
+        $employee->load('department', 'user');
+
+        return view('employees.show', compact('employee'));
+    }
+
     public function store(Request $request)
     {
-        $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'email' => 'required|email|unique:employees',
-            'department_id' => 'required',
-            'position' => 'required',
-            'hire_date' => 'required|date',
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:employees,email'],
+            'phone' => ['nullable', 'string', 'max:255'],
+            'address' => ['nullable', 'string'],
+            'department_id' => ['required', 'exists:departments,id'],
+            'position' => ['required', 'string', 'max:255'],
+            'hire_date' => ['required', 'date'],
+            'employment_status' => ['required', Rule::in(['active', 'inactive', 'terminated'])],
+            'user_id' => ['nullable', 'exists:users,id'],
         ]);
 
-        Employee::create($request->all());
+        if (!isset($validated['user_id'])) {
+            $validated['user_id'] = null;
+        }
+
+        Employee::create($validated);
 
         return redirect()->route('employees.index')
             ->with('success', 'Employee added successfully');
@@ -46,16 +63,20 @@ class EmployeeController extends Controller
 
     public function update(Request $request, Employee $employee)
     {
-        $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'email' => 'required|email|unique:employees,email,' . $employee->id,
-            'department_id' => 'required',
-            'position' => 'required',
-            'hire_date' => 'required|date',
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('employees', 'email')->ignore($employee->id)],
+            'phone' => ['nullable', 'string', 'max:255'],
+            'address' => ['nullable', 'string'],
+            'department_id' => ['required', 'exists:departments,id'],
+            'position' => ['required', 'string', 'max:255'],
+            'hire_date' => ['required', 'date'],
+            'employment_status' => ['required', Rule::in(['active', 'inactive', 'terminated'])],
+            'user_id' => ['nullable', 'exists:users,id'],
         ]);
 
-        $employee->update($request->all());
+        $employee->update($validated);
 
         return redirect()->route('employees.index')
             ->with('success', 'Employee updated successfully');

@@ -1,61 +1,90 @@
 <x-app-layout>
     <x-slot name="title">Department Report</x-slot>
 
-    <div class="max-w-6xl">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold">Department Report</h2>
-            <a href="{{ route('reports.index') }}" class="text-blue-600 hover:text-blue-800">← Back to Reports</a>
-        </div>
+    <div class="hris-shell">
+        <section class="hris-hero">
+            <div class="hris-hero-grid">
+                <div>
+                    <p class="hris-eyebrow">Reports</p>
+                    <h1 class="hris-title">Department Report</h1>
+                    <p class="hris-subtitle">View each department with its manager, status, and assigned employees.</p>
+                </div>
+
+                <a href="{{ route('reports.index') }}" class="hris-btn-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Reports</a>
+            </div>
+        </section>
 
         @if($departments->count())
-            <div class="space-y-6">
+            <div class="d-grid gap-3">
                 @foreach($departments as $dept)
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex justify-between items-start mb-4">
+                    <section class="hris-panel">
+                        <div class="hris-panel-header">
                             <div>
-                                <h3 class="text-2xl font-bold">{{ $dept->name }}</h3>
-                                <p class="text-gray-600">{{ $dept->description ?? 'No description' }}</p>
-                                <p class="text-sm text-gray-500 mt-2">Manager: {{ $dept->manager->name ?? 'N/A' }}</p>
+                                <h2 class="hris-panel-title">{{ $dept->name }}</h2>
+                                <p class="hris-panel-subtitle">{{ $dept->description ?? 'No description' }}</p>
                             </div>
-                            <span class="px-3 py-1 rounded-full text-sm {{ $dept->status === 'active' ? 'bg-green-200 text-green-800' : 'bg-gray-200' }}">
-                                {{ ucfirst($dept->status) }}
-                            </span>
+
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <span class="hris-pill hris-pill-info">{{ $dept->employees->count() }} employees</span>
+                                <span class="hris-pill {{ $dept->status === 'active' ? 'hris-pill-success' : 'hris-pill-neutral' }}">{{ ucfirst($dept->status) }}</span>
+                            </div>
                         </div>
 
-                        <div class="mb-4">
-                            <p class="font-semibold text-lg text-blue-600">{{ $dept->employees->count() }} Employees</p>
-                        </div>
+                        <div class="hris-panel-body">
+                            <div class="row g-3 mb-3">
+                                <div class="col-12 col-md-6">
+                                    <div class="card card-soft h-100">
+                                        <div class="card-body">
+                                            <div class="small text-uppercase text-secondary">Manager</div>
+                                            <div class="mt-2">{{ $dept->manager->name ?? 'N/A' }}</div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        @if($dept->employees->count())
-                            <table class="w-full text-sm">
-                                <thead class="bg-gray-50 border-b">
-                                    <tr>
-                                        <th class="px-4 py-2 text-left">Employee</th>
-                                        <th class="px-4 py-2 text-left">Position</th>
-                                        <th class="px-4 py-2 text-left">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($dept->employees as $emp)
-                                        <tr class="border-b">
-                                            <td class="px-4 py-2">{{ $emp->first_name }} {{ $emp->last_name }}</td>
-                                            <td class="px-4 py-2">{{ $emp->position }}</td>
-                                            <td class="px-4 py-2">
-                                                <span class="px-2 py-1 rounded text-xs {{ $emp->employment_status === 'active' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800' }}">
-                                                    {{ ucfirst($emp->employment_status) }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        @endif
-                    </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="card card-soft h-100">
+                                        <div class="card-body">
+                                            <div class="small text-uppercase text-secondary">Employee Count</div>
+                                            <div class="h4 mb-0 mt-2 text-primary">{{ $dept->employees->count() }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if($dept->employees->count())
+                                <div class="hris-table-wrap">
+                                    <table class="hris-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Employee</th>
+                                                <th>Position</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($dept->employees as $emp)
+                                                <tr>
+                                                    <td>{{ $emp->first_name }} {{ $emp->last_name }}</td>
+                                                    <td>{{ $emp->position }}</td>
+                                                    <td>
+                                                        <span class="hris-pill {{ $emp->employment_status === 'active' ? 'hris-pill-success' : 'hris-pill-danger' }}">
+                                                            {{ ucfirst($emp->employment_status) }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </div>
+                    </section>
                 @endforeach
             </div>
         @else
-            <div class="bg-white rounded-lg shadow p-6 text-center text-gray-500">
-                No department data available
+            <div class="hris-empty">
+                <div class="hris-empty-icon"><i class="bi bi-diagram-3"></i></div>
+                <p>No department data available.</p>
             </div>
         @endif
     </div>
