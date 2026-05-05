@@ -52,13 +52,33 @@ if [ -n "${PORT:-}" ] && [ "$PORT" != "80" ]; then
     sed -ri "s/<VirtualHost \\*:80>/<VirtualHost *:${PORT}>/" /etc/apache2/sites-available/000-default.conf
 fi
 
-if [ -n "${MYSQL_CA_CERT:-}" ] && [ -z "${MYSQL_ATTR_SSL_CA:-}" ]; then
+write_mysql_ca_file() {
+    cert_payload="$1"
+
     mkdir -p storage/certs
     mysql_ca_path="/var/www/html/storage/certs/mysql-ca.pem"
-    printf '%s\n' "$MYSQL_CA_CERT" > "$mysql_ca_path"
+    # Support PEM values with either real newlines or escaped "\\n" line breaks.
+    printf '%b\n' "$cert_payload" > "$mysql_ca_path"
     chown www-data:www-data "$mysql_ca_path"
     chmod 600 "$mysql_ca_path"
     export MYSQL_ATTR_SSL_CA="$mysql_ca_path"
+}
+
+if [ -n "${MYSQL_CA_CERT_BASE64:-}" ] && [ -z "${MYSQL_ATTR_SSL_CA:-}" ]; then
+    decoded_mysql_ca="$(printf '%s' "$MYSQL_CA_CERT_BASE64" | base64 -d)"
+    write_mysql_ca_file "$decoded_mysql_ca"
+fi
+
+if [ -n "${MYSQL_CA_CERT:-}" ] && [ -z "${MYSQL_ATTR_SSL_CA:-}" ]; then
+    write_mysql_ca_file "$MYSQL_CA_CERT"
+fi
+
+if [ -n "${MYSQL_ATTR_SSL_CA:-}" ] && [ ! -f "${MYSQL_ATTR_SSL_CA}" ]; then
+    case "$MYSQL_ATTR_SSL_CA" in
+        *"BEGIN CERTIFICATE"*)
+            write_mysql_ca_file "$MYSQL_ATTR_SSL_CA"
+            ;;
+    esac
 fi
 
 for runtime_key in \

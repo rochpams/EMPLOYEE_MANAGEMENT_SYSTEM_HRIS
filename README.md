@@ -17,3 +17,7 @@ The system will be developed using the **Laravel MVC framework**:
 - `RUN_MIGRATIONS=true` forces migrations.
 - `RUN_MIGRATIONS=false` skips migrations.
 - If you use `SESSION_DRIVER=database`, make sure migrations are enabled so the `sessions` table exists.
+- For MySQL providers that require SSL (for example Aiven), provide one of these:
+- `MYSQL_ATTR_SSL_CA=/absolute/path/to/ca.pem` when the cert file already exists in the container.
+- `MYSQL_CA_CERT` with full PEM content (supports both real newlines and escaped `\n`).
+- `MYSQL_CA_CERT_BASE64` with base64-encoded PEM content.
