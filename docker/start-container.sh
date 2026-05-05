@@ -237,11 +237,15 @@ if [ "$run_migrations" = "true" ]; then
         echo "MYSQL_ATTR_SSL_CA is not set"
     fi
     echo "Attempting migrations..."
-    php artisan migrate --force --no-interaction
+    if ! php artisan migrate --force --no-interaction; then
+        echo "Migration step failed; continuing startup so the application UI can load."
+    fi
 fi
 
 if [ "${RUN_SEEDERS:-false}" = "true" ]; then
-    php artisan db:seed --class="${SEEDER_CLASS:-Database\\Seeders\\DatabaseSeeder}" --force --no-interaction
+    if ! php artisan db:seed --class="${SEEDER_CLASS:-Database\\Seeders\\DatabaseSeeder}" --force --no-interaction; then
+        echo "Seeder step failed; continuing startup."
+    fi
 fi
 
 exec "$@"
