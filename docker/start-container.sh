@@ -62,6 +62,7 @@ write_mysql_ca_file() {
     chown www-data:www-data "$mysql_ca_path"
     chmod 600 "$mysql_ca_path"
     export MYSQL_ATTR_SSL_CA="$mysql_ca_path"
+    echo "WROTE_MYSQL_CA=1 PATH=$mysql_ca_path"
 }
 
 if [ -n "${MYSQL_CA_CERT_BASE64:-}" ] && [ -z "${MYSQL_ATTR_SSL_CA:-}" ]; then
@@ -221,6 +222,17 @@ fi
 php artisan package:discover --ansi --no-interaction
 
 if [ "$run_migrations" = "true" ]; then
+    if [ -n "${MYSQL_ATTR_SSL_CA:-}" ]; then
+        echo "MYSQL_ATTR_SSL_CA is set to: ${MYSQL_ATTR_SSL_CA}"
+        if [ -f "${MYSQL_ATTR_SSL_CA}" ]; then
+            ls -l "${MYSQL_ATTR_SSL_CA}"
+        else
+            echo "MYSQL_ATTR_SSL_CA file does not exist: ${MYSQL_ATTR_SSL_CA}"
+        fi
+    else
+        echo "MYSQL_ATTR_SSL_CA is not set"
+    fi
+    echo "Attempting migrations..."
     php artisan migrate --force --no-interaction
 fi
 
