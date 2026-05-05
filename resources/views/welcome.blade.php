@@ -8,16 +8,54 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        body {
+            font-family: 'Manrope', 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at top left, #eff6ff 0%, #f8fafc 40%, #eef2f7 100%);
+            color: #1f2937;
+        }
+
+        .welcome-shell {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .welcome-panel {
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid #dfe4ea;
+            border-radius: 1rem;
+            box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+        }
+
+        .welcome-panel .badge {
+            letter-spacing: 0.08em;
+        }
+
+        .welcome-hero {
+            border-left: 4px solid #1e4ed8;
+            padding-left: 1rem;
+        }
+
+        .welcome-feature {
+            border: 1px solid #dfe4ea;
+            border-radius: 0.9rem;
+            background: #fff;
+            min-height: 100%;
+        }
+    </style>
 </head>
 <body>
-    <div class="auth-wrapper py-5">
-        <div class="container py-2 py-md-4">
+    <div class="welcome-shell py-4 py-md-5">
+        <div class="container">
             <div class="row justify-content-center align-items-center g-4">
                 <div class="col-12 col-xl-7">
-                    <div class="auth-panel p-4 p-md-5 h-100">
+                    <div class="welcome-panel p-4 p-md-5 h-100">
                         <span class="badge text-bg-light border mb-3">Human Resource Information System</span>
-                        <h1 class="display-6 fw-bold mb-3">Employee Management System</h1>
-                        <p class="text-secondary mb-4">Manage employees, departments, attendance, and leave requests from one secure workspace built for admin, HR, manager, and employee roles.</p>
+                        <div class="welcome-hero mb-4">
+                            <h1 class="display-6 fw-bold mb-2">Employee Management System</h1>
+                            <p class="text-secondary mb-0">Manage employees, departments, attendance, and leave requests from one secure workspace built for admin, HR, manager, and employee roles.</p>
+                        </div>
 
                         <div class="d-flex flex-wrap gap-2 mb-4">
                             <a href="{{ route('login') }}" class="btn btn-primary">
@@ -32,7 +70,7 @@
 
                         <div class="row g-3">
                             <div class="col-12 col-md-4">
-                                <div class="card card-soft h-100">
+                                <div class="card card-soft welcome-feature h-100">
                                     <div class="card-body">
                                         <div class="d-flex align-items-center gap-2 mb-2">
                                             <i class="bi bi-shield-check text-primary"></i>
@@ -43,7 +81,7 @@
                                 </div>
                             </div>
                             <div class="col-12 col-md-4">
-                                <div class="card card-soft h-100">
+                                <div class="card card-soft welcome-feature h-100">
                                     <div class="card-body">
                                         <div class="d-flex align-items-center gap-2 mb-2">
                                             <i class="bi bi-calendar2-check text-primary"></i>
@@ -54,7 +92,7 @@
                                 </div>
                             </div>
                             <div class="col-12 col-md-4">
-                                <div class="card card-soft h-100">
+                                <div class="card card-soft welcome-feature h-100">
                                     <div class="card-body">
                                         <div class="d-flex align-items-center gap-2 mb-2">
                                             <i class="bi bi-graph-up-arrow text-primary"></i>
@@ -69,7 +107,7 @@
                 </div>
 
                 <div class="col-12 col-xl-4">
-                    <div class="auth-panel p-4 p-md-5 h-100">
+                    <div class="welcome-panel p-4 p-md-5 h-100">
                         <h2 class="h5 fw-bold mb-3">What you can do</h2>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item px-0 d-flex gap-3 align-items-start">
