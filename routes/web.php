@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public routes
 Route::get('/', function () {
-    return auth()->check() ? redirect()->route('dashboard') : view('welcome');
+    return view('welcome');
 });
 
 // Authenticated routes
