@@ -238,7 +238,12 @@ if [ "$run_migrations" = "true" ]; then
     fi
     echo "Attempting migrations..."
     if ! php artisan migrate --force --no-interaction; then
-        echo "Migration step failed; continuing startup so the application UI can load."
+        if [ "${APP_ENV:-}" = "production" ]; then
+            echo "Migration step failed in production; aborting startup to avoid serving a broken 500 state." >&2
+            exit 1
+        fi
+
+        echo "Migration step failed; continuing startup in non-production mode."
     fi
 fi
 
