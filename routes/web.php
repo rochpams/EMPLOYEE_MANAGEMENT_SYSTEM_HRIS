@@ -7,11 +7,12 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Manager\DepartmentEmployeeController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 // Authenticated routes
@@ -53,6 +54,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/leaves', [ReportController::class, 'leaveReport'])->name('leaves');
             Route::get('/departments', [ReportController::class, 'departmentReport'])->name('departments');
             Route::get('/activity', [ReportController::class, 'activityReport'])->name('activity');
+            Route::get('/{type}/export/{format}', [ReportController::class, 'export'])->name('export');
             Route::get('/{type}', [ReportController::class, 'show'])->name('show');
         });
     });
@@ -64,11 +66,8 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    // Admin and HR - Attendance marking
-    Route::middleware('role:admin,hr')->group(function () {
-        Route::prefix('attendance')->name('attendance.')->group(function () {
-            Route::post('/mark', [AttendanceController::class, 'markAttendance'])->name('mark');
-        });
+    Route::middleware('role:manager')->prefix('manager')->name('manager.')->group(function () {
+        Route::get('/department-employees', [DepartmentEmployeeController::class, 'index'])->name('department-employees.index');
     });
 
     // Employee routes

@@ -3,7 +3,7 @@
         <div class="auth-icon mx-auto mb-3">
             <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
         </div>
-        <h1 class="h4 fw-bold mb-1">Sign In</h1>
+        <h1 class="h4 fw-bold mb-1">Welcome</h1>
         <p class="text-secondary mb-0">Access your HRIS dashboard.</p>
     </div>
 
@@ -30,9 +30,9 @@
             <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
         </div>
 
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="remember" name="remember">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2" >
+            <div class="form-check d-flex align-items-center justify-content-start p-0 gap-2" >
+                <input class="" type="checkbox" id="remember" name="remember" >
                 <label class="form-check-label" for="remember">Remember me</label>
             </div>
 
@@ -47,7 +47,7 @@
         </button>
     </form>
 
-    <p class="text-center text-secondary mt-4 mb-0">
+    <!-- <p class="text-center text-secondary mt-4 mb-0">
         Need an account? <a href="{{ route('register') }}" class="fw-semibold">Register</a>
-    </p>
+    </p> -->
 </x-guest-layout>

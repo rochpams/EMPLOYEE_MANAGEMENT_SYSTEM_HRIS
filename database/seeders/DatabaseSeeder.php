@@ -150,5 +150,12 @@ class DatabaseSeeder extends Seeder
                 'approved_by' => null,
             ]
         );
+
+        $this->call([
+            DepartmentSeeder::class,
+            EmployeeSeeder::class,
+            AttendanceSeeder::class,
+            LeaveRequestSeeder::class,
+        ]);
     }
 }

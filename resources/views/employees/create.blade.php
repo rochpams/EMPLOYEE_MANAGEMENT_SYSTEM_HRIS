@@ -11,7 +11,7 @@
 
             @if ($errors->any())
                 <div class="hris-alert hris-alert-error mb-4">
-                    <ul class="list-disc list-inside space-y-1">
+                    <ul class="mb-0 ps-3 d-grid gap-1">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -19,7 +19,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('employees.store') }}" class="space-y-5">
+            <form method="POST" action="{{ route('employees.store') }}" class="d-grid gap-4">
                 @csrf
 
                 <div class="hris-form-grid hris-form-grid-2">
@@ -36,6 +36,18 @@
                 <div class="hris-form-group">
                     <label class="hris-form-label">Email</label>
                     <input type="email" name="email" value="{{ old('email') }}" class="hris-form-input">
+                </div>
+
+                <div class="hris-form-grid hris-form-grid-2">
+                    <div class="hris-form-group">
+                        <label class="hris-form-label">Password</label>
+                        <input type="password" name="password" class="hris-form-input" autocomplete="new-password">
+                        <p class="hris-form-help mt-2">Use at least 8 characters to secure the employee account.</p>
+                    </div>
+                    <div class="hris-form-group">
+                        <label class="hris-form-label">Confirm Password</label>
+                        <input type="password" name="password_confirmation" class="hris-form-input" autocomplete="new-password">
+                    </div>
                 </div>
 
                 <div class="hris-form-grid hris-form-grid-2">

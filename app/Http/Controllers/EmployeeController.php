@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\Department;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -35,21 +37,37 @@ class EmployeeController extends Controller
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:employees,email'],
+            'email' => ['required', 'email', 'max:255', 'unique:employees,email', 'unique:users,email'],
             'phone' => ['nullable', 'string', 'max:255'],
             'address' => ['nullable', 'string'],
             'department_id' => ['required', 'exists:departments,id'],
             'position' => ['required', 'string', 'max:255'],
             'hire_date' => ['required', 'date'],
             'employment_status' => ['required', Rule::in(['active', 'inactive', 'terminated'])],
-            'user_id' => ['nullable', 'exists:users,id'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        if (!isset($validated['user_id'])) {
-            $validated['user_id'] = null;
-        }
+        DB::transaction(function () use ($validated) {
+            $user = User::create([
+                'name' => trim($validated['first_name'].' '.$validated['last_name']),
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'role' => 'employee',
+            ]);
 
-        Employee::create($validated);
+            Employee::create([
+                'user_id' => $user->id,
+                'department_id' => $validated['department_id'],
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? null,
+                'address' => $validated['address'] ?? null,
+                'position' => $validated['position'],
+                'hire_date' => $validated['hire_date'],
+                'employment_status' => $validated['employment_status'],
+            ]);
+        });
 
         return redirect()->route('employees.index')
             ->with('success', 'Employee added successfully');
@@ -66,17 +84,23 @@ class EmployeeController extends Controller
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('employees', 'email')->ignore($employee->id)],
+            'email' => ['required', 'email', 'max:255', Rule::unique('employees', 'email')->ignore($employee->id), Rule::unique('users', 'email')->ignore($employee->user_id)],
             'phone' => ['nullable', 'string', 'max:255'],
             'address' => ['nullable', 'string'],
             'department_id' => ['required', 'exists:departments,id'],
             'position' => ['required', 'string', 'max:255'],
             'hire_date' => ['required', 'date'],
             'employment_status' => ['required', Rule::in(['active', 'inactive', 'terminated'])],
-            'user_id' => ['nullable', 'exists:users,id'],
         ]);
 
         $employee->update($validated);
+
+        if ($employee->user) {
+            $employee->user->update([
+                'name' => trim($validated['first_name'].' '.$validated['last_name']),
+                'email' => $validated['email'],
+            ]);
+        }
 
         return redirect()->route('employees.index')
             ->with('success', 'Employee updated successfully');

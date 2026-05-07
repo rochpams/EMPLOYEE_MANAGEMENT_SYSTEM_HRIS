@@ -17,19 +17,32 @@
         <section class="hris-stat-grid">
             <div class="hris-stat-card">
                 <p class="hris-stat-label">Today Check-ins</p>
-                <p class="hris-stat-value text-sky-300">{{ $stats['today_checkins'] ?? 0 }}</p>
+                <p class="hris-stat-value text-primary">{{ $stats['today_checkins'] ?? 0 }}</p>
             </div>
             <div class="hris-stat-card">
                 <p class="hris-stat-label">Pending Approvals</p>
-                <p class="hris-stat-value text-amber-300">{{ $stats['pending_approvals'] ?? 0 }}</p>
+                <p class="hris-stat-value text-warning">{{ $stats['pending_approvals'] ?? 0 }}</p>
             </div>
             <div class="hris-stat-card">
                 <p class="hris-stat-label">Approved Today</p>
-                <p class="hris-stat-value text-emerald-300">{{ $stats['approved_today'] ?? 0 }}</p>
+                <p class="hris-stat-value text-success">{{ $stats['approved_today'] ?? 0 }}</p>
             </div>
             <div class="hris-stat-card">
                 <p class="hris-stat-label">New Employees</p>
-                <p class="hris-stat-value text-violet-300">{{ $stats['new_employees'] ?? 0 }}</p>
+                <p class="hris-stat-value text-info">{{ $stats['new_employees'] ?? 0 }}</p>
+            </div>
+        </section>
+
+        <section class="hris-panel">
+            <div class="hris-panel-header">
+                <div>
+                    <h2 class="hris-panel-title">Activity Statistics</h2>
+                    <p class="hris-panel-subtitle">Visual breakdown of recent activities by type.</p>
+                </div>
+            </div>
+
+            <div class="hris-panel-body">
+                <canvas id="activityChart" height="80"></canvas>
             </div>
         </section>
 
@@ -65,4 +78,64 @@
             </div>
         @endif
     </div>
+
+    <script>
+        const ctx = document.getElementById('activityChart');
+        if (ctx && window.Chart) {
+            const activityChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Today Check-ins', 'Pending Approvals', 'Approved Today', 'New Employees'],
+                    datasets: [{
+                        label: 'Count',
+                        data: [
+                            {{ $stats['today_checkins'] ?? 0 }},
+                            {{ $stats['pending_approvals'] ?? 0 }},
+                            {{ $stats['approved_today'] ?? 0 }},
+                            {{ $stats['new_employees'] ?? 0 }}
+                        ],
+                        backgroundColor: [
+                            '#2563eb',
+                            '#f59e0b',
+                            '#10b981',
+                            '#8b5cf6'
+                        ],
+                        borderRadius: 8,
+                        barThickness: 18
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#5b6776',
+                                font: { size: 12 }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#5b6776'
+                            },
+                            grid: {
+                                color: 'rgba(91, 103, 118, 0.15)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#162033'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </x-app-layout>

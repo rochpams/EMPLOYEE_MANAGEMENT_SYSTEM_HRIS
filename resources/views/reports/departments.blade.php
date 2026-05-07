@@ -14,6 +14,19 @@
             </div>
         </section>
 
+        <section class="hris-panel">
+            <div class="hris-panel-header">
+                <div>
+                    <h2 class="hris-panel-title">Employee Distribution by Department</h2>
+                    <p class="hris-panel-subtitle">Visual breakdown of employees across departments.</p>
+                </div>
+            </div>
+
+            <div class="hris-panel-body">
+                <canvas id="departmentChart" height="80"></canvas>
+            </div>
+        </section>
+
         @if($departments->count())
             <div class="d-grid gap-3">
                 @foreach($departments as $dept)
@@ -88,4 +101,71 @@
             </div>
         @endif
     </div>
+
+    <script>
+        const ctx = document.getElementById('departmentChart');
+        if (ctx && window.Chart) {
+            const departmentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        @foreach($departments as $dept)
+                            '{{ $dept->name }}',
+                        @endforeach
+                    ],
+                    datasets: [{
+                        label: 'Number of Employees',
+                        data: [
+                            @foreach($departments as $dept)
+                                {{ $dept->employees->count() }},
+                            @endforeach
+                        ],
+                        backgroundColor: [
+                            '#2563eb',
+                            '#10b981',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#8b5cf6',
+                            '#ec4899',
+                            '#06b6d4',
+                            '#f97316'
+                        ],
+                        borderRadius: 8,
+                        barThickness: 20
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    indexAxis: 'x',
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#5b6776',
+                                font: { size: 12 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: '#5b6776'
+                            },
+                            grid: {
+                                color: 'rgba(91, 103, 118, 0.15)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#162033'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </x-app-layout>

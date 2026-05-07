@@ -14,6 +14,14 @@
         <span>Dashboard</span>
     </a>
 
+    @if(auth()->user()->isManager())
+        <div class="px-2 pt-2 pb-1 small text-uppercase text-muted fw-semibold">Manager</div>
+        <a href="{{ route('manager.department-employees.index') }}" class="app-nav-link {{ request()->routeIs('manager.department-employees.*') ? 'active' : '' }}">
+            <i class="bi bi-people-fill" aria-hidden="true"></i>
+            <span>Department Employees</span>
+        </a>
+    @endif
+
     @if(auth()->user()->isAdmin() || auth()->user()->isHR())
         <a href="{{ route('employees.index') }}" class="app-nav-link {{ request()->routeIs('employees.*') ? 'active' : '' }}">
             <i class="bi bi-people" aria-hidden="true"></i>

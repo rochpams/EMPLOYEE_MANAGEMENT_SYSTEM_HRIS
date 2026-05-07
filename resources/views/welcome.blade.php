@@ -11,8 +11,8 @@
     <style>
         body {
             font-family: 'Manrope', 'Segoe UI', sans-serif;
-            background: radial-gradient(circle at top left, #eff6ff 0%, #f8fafc 40%, #eef2f7 100%);
-            color: #1f2937;
+            background: radial-gradient(circle at top left, #eff6ff 0%, var(--app-bg) 40%, var(--app-bg-alt) 100%);
+            color: var(--app-text);
         }
 
         .welcome-shell {
@@ -23,9 +23,9 @@
 
         .welcome-panel {
             background: rgba(255, 255, 255, 0.94);
-            border: 1px solid #dfe4ea;
+            border: 1px solid var(--app-border);
             border-radius: 1rem;
-            box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+            box-shadow: var(--app-shadow);
         }
 
         .welcome-panel .badge {
@@ -33,12 +33,12 @@
         }
 
         .welcome-hero {
-            border-left: 4px solid #1e4ed8;
+            border-left: 4px solid var(--app-primary);
             padding-left: 1rem;
         }
 
         .welcome-feature {
-            border: 1px solid #dfe4ea;
+            border: 1px solid var(--app-border);
             border-radius: 0.9rem;
             background: #fff;
             min-height: 100%;

@@ -17,19 +17,34 @@
         <section class="hris-stat-grid">
             <div class="hris-stat-card">
                 <p class="hris-stat-label">Pending</p>
-                <p class="hris-stat-value text-amber-300">{{ $summary['pending'] ?? 0 }}</p>
+                <p class="hris-stat-value text-warning">{{ $summary['pending'] ?? 0 }}</p>
             </div>
             <div class="hris-stat-card">
                 <p class="hris-stat-label">Approved</p>
-                <p class="hris-stat-value text-emerald-300">{{ $summary['approved'] ?? 0 }}</p>
+                <p class="hris-stat-value text-success">{{ $summary['approved'] ?? 0 }}</p>
             </div>
             <div class="hris-stat-card">
                 <p class="hris-stat-label">Rejected</p>
-                <p class="hris-stat-value text-rose-300">{{ $summary['rejected'] ?? 0 }}</p>
+                <p class="hris-stat-value text-danger">{{ $summary['rejected'] ?? 0 }}</p>
             </div>
             <div class="hris-stat-card">
                 <p class="hris-stat-label">Total</p>
-                <p class="hris-stat-value text-sky-300">{{ $summary['total'] ?? 0 }}</p>
+                <p class="hris-stat-value text-primary">{{ $summary['total'] ?? 0 }}</p>
+            </div>
+        </section>
+
+        <section class="hris-panel">
+            <div class="hris-panel-header">
+                <div>
+                    <h2 class="hris-panel-title">Leave Request Status Distribution</h2>
+                    <p class="hris-panel-subtitle">Visual breakdown of leave request statuses.</p>
+                </div>
+            </div>
+
+            <div class="hris-panel-body">
+                <div class="hris-chart-wrap">
+                    <canvas id="leavesChart" height="100"></canvas>
+                </div>
             </div>
         </section>
 
@@ -82,4 +97,45 @@
             </div>
         @endif
     </div>
+
+    <script>
+        const ctx = document.getElementById('leavesChart');
+        if (ctx && window.Chart) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pending', 'Approved', 'Rejected'],
+                    datasets: [{
+                        data: [
+                            {{ $summary['pending'] ?? 0 }},
+                            {{ $summary['approved'] ?? 0 }},
+                            {{ $summary['rejected'] ?? 0 }}
+                        ],
+                        backgroundColor: ['#f59e0b', '#10b981', '#ef4444'],
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    cutout: '58%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#5b6776',
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => ` ${context.label}: ${context.parsed}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </x-app-layout>

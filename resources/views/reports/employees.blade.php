@@ -14,6 +14,21 @@
             </div>
         </section>
 
+        <section class="hris-panel">
+            <div class="hris-panel-header">
+                <div>
+                    <h2 class="hris-panel-title">Employee Status Distribution</h2>
+                    <p class="hris-panel-subtitle">Visual breakdown of employees by employment status.</p>
+                </div>
+            </div>
+
+            <div class="hris-panel-body">
+                <div class="hris-chart-wrap">
+                    <canvas id="employeeStatusChart" height="100"></canvas>
+                </div>
+            </div>
+        </section>
+
         @if($employees->count())
             <section class="hris-panel">
                 <div class="hris-panel-header">
@@ -63,4 +78,61 @@
             </div>
         @endif
     </div>
+
+    <script>
+        @php
+            $statusCounts = [];
+            foreach($employees as $emp) {
+                $status = ucfirst($emp->employment_status);
+                $statusCounts[$status] = ($statusCounts[$status] ?? 0) + 1;
+            }
+        @endphp
+        
+        const ctx = document.getElementById('employeeStatusChart');
+        if (ctx && window.Chart) {
+            const labels = [
+                @foreach($statusCounts as $status => $count)
+                    '{{ $status }}',
+                @endforeach
+            ];
+            const data = [
+                @foreach($statusCounts as $status => $count)
+                    {{ $count }},
+                @endforeach
+            ];
+            const palette = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        backgroundColor: labels.map((_, i) => palette[i % palette.length]),
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    cutout: '58%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#5b6776',
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => ` ${context.label}: ${context.parsed} employees`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </x-app-layout>

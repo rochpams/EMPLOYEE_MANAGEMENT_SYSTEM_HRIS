@@ -11,7 +11,7 @@
 
             @if ($errors->any())
                 <div class="hris-alert hris-alert-error mb-4">
-                    <ul class="list-disc list-inside space-y-1">
+                    <ul class="mb-0 ps-3 d-grid gap-1">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -19,7 +19,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('employees.update', $employee) }}" class="space-y-5">
+            <form method="POST" action="{{ route('employees.update', $employee) }}" class="d-grid gap-4">
                 @csrf
                 @method('PATCH')
 
