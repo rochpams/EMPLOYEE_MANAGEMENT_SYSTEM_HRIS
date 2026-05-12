@@ -71,7 +71,27 @@
                             </div>
 
                             <div class="d-flex flex-column align-items-start align-items-lg-end gap-2">
-                                <a href="{{ route('leave-requests.show', $leave) }}" class="btn btn-sm btn-outline-secondary">Review Details</a>
+                                @if(auth()->user()->isAdmin() || auth()->user()->isHR() || auth()->user()->isManager())
+                                    @if($leave->status === 'pending')
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <form action="{{ route('leave-requests.update-status', $leave) }}" method="POST">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="status" value="approved">
+                                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                            </form>
+
+                                            <form action="{{ route('leave-requests.update-status', $leave) }}" method="POST">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="status" value="rejected">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                                            </form>
+                                        </div>
+                                    @endif
+                                @else
+                                    <a href="{{ route('leave-requests.show', $leave) }}" class="btn btn-sm btn-outline-secondary">Review Details</a>
+                                @endif
 
                                 @if(auth()->user()->isEmployee() && $leave->status === 'pending')
                                     <form action="{{ route('leave-requests.cancel', $leave) }}" method="POST" onsubmit="return confirm('Cancel this request?')">
