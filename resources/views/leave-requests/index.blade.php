@@ -71,7 +71,7 @@
                             </div>
 
                             <div class="d-flex flex-column align-items-start align-items-lg-end gap-2">
-                                @if(auth()->user()->isAdmin() || auth()->user()->isHR() || auth()->user()->isManager())
+                                @if(auth()->user()->isManager())
                                     @if($leave->status === 'pending')
                                         <div class="d-flex flex-wrap gap-2">
                                             <form action="{{ route('leave-requests.update-status', $leave) }}" method="POST">

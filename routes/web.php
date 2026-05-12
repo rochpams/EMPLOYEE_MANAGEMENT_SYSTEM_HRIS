@@ -59,8 +59,8 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    // Manager and HR routes - Leave request approval
-    Route::middleware('role:admin,hr,manager')->group(function () {
+    // Manager-only routes - Leave request approval
+    Route::middleware('role:manager')->group(function () {
         Route::prefix('leave-requests')->name('leave-requests.')->group(function () {
             Route::patch('/{leaveRequest}/status', [LeaveRequestController::class, 'updateStatus'])->name('update-status');
         });

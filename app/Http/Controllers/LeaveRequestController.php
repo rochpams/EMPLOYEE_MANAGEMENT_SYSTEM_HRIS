@@ -116,7 +116,15 @@ class LeaveRequestController extends Controller
         }
 
         $actor = auth()->user();
-        if (!$actor->isAdmin() && !$actor->isHR() && !$actor->isManager()) {
+        // Only managers can approve or reject leave requests
+        if (!$actor->isManager()) {
+            return redirect()->back()->with('error', 'Unauthorized');
+        }
+
+        // Ensure manager is responsible for the employee's department
+        $managedDepartmentIds = $actor->managedDepartments()->pluck('id')->toArray();
+        $employee = $leaveRequest->employee;
+        if (!$employee || !in_array($employee->department_id, $managedDepartmentIds)) {
             return redirect()->back()->with('error', 'Unauthorized');
         }
 
