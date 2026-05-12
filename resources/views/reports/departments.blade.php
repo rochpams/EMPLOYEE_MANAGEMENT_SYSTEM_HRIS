@@ -10,7 +10,11 @@
                     <p class="hris-subtitle">View each department with its manager, status, and assigned employees.</p>
                 </div>
 
-                <a href="{{ route('reports.index') }}" class="hris-btn-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Reports</a>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ route('reports.export', ['type' => 'departments', 'format' => 'csv']) }}" class="hris-btn-secondary">CSV Export</a>
+                    <a href="{{ route('reports.export', ['type' => 'departments', 'format' => 'pdf']) }}" class="hris-btn-primary">PDF Export</a>
+                    <a href="{{ route('reports.index') }}" class="hris-btn-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Reports</a>
+                </div>
             </div>
         </section>
 

@@ -47,6 +47,7 @@
                     <div class="hris-form-group">
                         <label class="hris-form-label">Confirm Password</label>
                         <input type="password" name="password_confirmation" class="hris-form-input" autocomplete="new-password">
+                        <p class="hris-form-help mt-2">Must match the password above.</p>
                     </div>
                 </div>
 

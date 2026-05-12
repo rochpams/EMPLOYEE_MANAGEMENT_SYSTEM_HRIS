@@ -49,6 +49,45 @@
             </div>
         </section>
 
+        @php
+            $exportReports = [
+                ['label' => 'Employees', 'type' => 'employees', 'description' => 'Employee records with department and account details.'],
+                ['label' => 'Attendance', 'type' => 'attendance', 'description' => 'Presence, absence, and time log records.'],
+                ['label' => 'Leaves', 'type' => 'leaves', 'description' => 'Leave request history and approval status.'],
+                ['label' => 'Departments', 'type' => 'departments', 'description' => 'Department coverage and staffing totals.'],
+                ['label' => 'Activity', 'type' => 'activity', 'description' => 'Operational HR activity for the selected period.'],
+            ];
+        @endphp
+
+        <section class="hris-panel">
+            <div class="hris-panel-header">
+                <div>
+                    <h2 class="hris-panel-title">Export Center</h2>
+                    <p class="hris-panel-subtitle">Generate CSV or PDF files for each report type.</p>
+                </div>
+            </div>
+
+            <div class="hris-panel-body">
+                <div class="hris-grid">
+                    @foreach($exportReports as $report)
+                        <div class="card card-soft h-100">
+                            <div class="card-body d-grid gap-3">
+                                <div>
+                                    <div class="fw-semibold hris-text-dark">{{ $report['label'] }} Report</div>
+                                    <div class="small hris-muted">{{ $report['description'] }}</div>
+                                </div>
+
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a href="{{ route('reports.export', ['type' => $report['type'], 'format' => 'csv']) }}" class="hris-btn-secondary">CSV Export</a>
+                                    <a href="{{ route('reports.export', ['type' => $report['type'], 'format' => 'pdf']) }}" class="hris-btn-primary">PDF Export</a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
 
         <section class="hris-panel">
             <div class="hris-panel-header">
